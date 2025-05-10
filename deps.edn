@@ -13,4 +13,6 @@
         cheshire/cheshire         {:mvn/version "5.13.0"}
         buddy/buddy-sign          {:mvn/version "3.6.1-359"}
         ring-cors/ring-cors       {:mvn/version "0.1.13"}}
- :aliases {:dev {:main-opts ["-m" "sge-facom.core"]}}}
+ :aliases {:dev {:main-opts ["-m" "sge-facom.core"]}
+           :build {:deps {io.github.clojure/tools.build {:git/tag "v0.10.8" :git/sha "2fdfd66"}}
+                   :ns-default build}}}

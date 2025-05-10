@@ -1,5 +1,6 @@
 (ns sge-facom.infrastructure.db.sqlite
   (:require [next.jdbc :as jdbc]
+            [next.jdbc.result-set :as rs]
             [clojure.java.io :as io]
             [clojure.string :as string]))
 
@@ -8,7 +9,9 @@
 (defn read-sql-file [path]
   (slurp (io/resource path)))
 
-(def ds (jdbc/get-datasource db-spec))
+(def ds (-> db-spec
+            (jdbc/get-datasource)
+            (jdbc/with-options {:builder-fn rs/as-unqualified-maps})))
 
 (defn init-db []
   (let [sql-content (read-sql-file "schema.sql")

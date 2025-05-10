@@ -10,19 +10,16 @@
     (let [uri (:uri req)
           token (get-in req [:headers "authorization"])
           token (some-> token (string/replace #"^Bearer " ""))]
-      (if (contains? #{"/teste" "/users/login" "/users/cadastro"} uri)
-        (do
-          (println "Aqui passou")
-          (handler req))
-        (try
-          (if-let [claims (jwt/read_token token)]
+      (if (contains? #{"/teste" "/users/login" "/users/cadastro" "/users/list"} uri)
+        (handler req)
+        (let [claims (try
+                       (jwt/read_token token)
+                       (catch Exception e
+                         (println "Erro ao verificar token: " (.getMessage e))
+                         ::invalid-token))]
+          (if (and claims (not= claims ::invalid-token))
             (handler (assoc req :claims claims))
             (-> (response (json/generate-string {:error "Token inválido ou ausente"}))
-                (status 401)
-                (assoc :headers {"Content-Type" "application/json"})))
-          (catch Exception e
-            (println "Erro ao veriricar token: " (.getMessage e))
-            (-> (response (json/generate-string {:error "Token inválido ou corrompido"}))
                 (status 401)
                 (assoc :headers {"Content-Type" "application/json"}))))))))
 
